@@ -1,0 +1,54 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+
+      - name: Set up .env file for server
+        run: |
+          echo "MONGO_URI=${{ secrets.MONGO_URI }}" > ./server/.env
+          echo "PORT=${{ secrets.PORT }}" >> ./server/.env
+          
+      - name: Set up .env file for client
+        run: |
+          echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" > ./client/.env
+
+      - name: Build and push Backend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./server
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/employees-backend:latest
+
+      - name: Build and push Frontend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./client
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/employees-frontend:latest
+
+    
+      - name: Deploy to Local Deployment Environment
+        if: success()
+        run: |
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/employees-backend:latest
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/employees-frontend:latest
+          docker run -d -p 5000:5000 ${{ secrets.DOCKERHUB_USERNAME }}/employees-backend:latest
+          docker run -d -p 3000:3000 ${{ secrets.DOCKERHUB_USERNAME }}/employees-frontend:latest
