@@ -1,0 +1,35 @@
+version: '3'
+services:
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - '3000:80' 
+    depends_on:
+      - backend
+    links:
+      - backend
+
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - '5000:5000' 
+    environment:
+      - MONGO_URI=mongodb+srv://drinkadriu6:eBFJW1k1IyRJa3mQ@kiii.byujm.mongodb.net/?retryWrites=true&w=majority&appName=kiii
+    depends_on:
+      - mongo
+    links:
+      - mongo
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
