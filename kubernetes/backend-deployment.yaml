@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: staff-config
+  namespace: staff
+data:
+  MONGO_URI: mongodb+srv://drinkadriu6:eBFJW1k1IyRJa3mQ@kiii.byujm.mongodb.net/?retryWrites=true&w=majority&appName=kiii
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: staff-secret
+  namespace: staff
+type: Opaque
+data:
+  MONGO_URI: bW9uZ29kYitzcnY6Ly9kcmlua2Fkcml1NjplQkZKVzFrMUl5UkphM21RQGtpaWkuYnl1am0ubW9uZ29kYi5uZXQvP3JldHJ5V3JpdGVzPXRydWUmdz1tYWpvcml0eSZhcHBOYW1lPWtpaWk=
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: staff-backend-deployment
+  namespace: staff
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: staff-project
+  template:
+    metadata:
+      labels:
+        app: staff-project
+    spec:
+      containers:
+        - name: staff-project
+          image: kadriudrin/employees-backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: staff-config
+          env:
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: staff-secret
+                  key: MONGO_URI

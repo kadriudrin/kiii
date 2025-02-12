@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: staff-frontend-deployment
+  namespace: staff
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: staff-frontend
+  template:
+    metadata:
+      labels:
+        app: staff-frontend
+    spec:
+      containers:
+        - name: staff-frontend
+          image: kadriudrin/employees-frontend
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 3000

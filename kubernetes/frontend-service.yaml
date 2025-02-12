@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: staff-frontend-service
+  namespace: staff
+spec:
+  selector:
+    app: staff-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
