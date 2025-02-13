@@ -10,6 +10,7 @@ const App = () => {
     return (
         <div className="container">
             <Navbar />
+            HELLO
             <Routes>
                 <Route exact path="/" element={<RecordList />} />
                 <Route path="/edit/:id" element={<Edit />} />
