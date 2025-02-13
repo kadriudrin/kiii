@@ -24,11 +24,11 @@ spec:
   replicas: 3
   selector:
     matchLabels:
-      app: staff-project
+      app: staff-backend
   template:
     metadata:
       labels:
-        app: staff-project
+        app: staff-backend
     spec:
       containers:
         - name: staff-project
@@ -40,6 +40,8 @@ spec:
             - configMapRef:
                 name: staff-config
           env:
+            - name: PORT
+              value: "5000"
             - name: MONGO_URI
               valueFrom:
                 secretKeyRef:
